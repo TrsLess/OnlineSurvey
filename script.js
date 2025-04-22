@@ -199,5 +199,5 @@ downloadBtn.addEventListener("click", () => {
 
 // Rate Us button click
 rateUsBtn.addEventListener("click", () => {
-  window.location.href = "rating.html";
+  window.location.href = "rating.php";
 });
