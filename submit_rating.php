@@ -19,7 +19,7 @@ if (isset($_POST['rating'])) {
     $stmt->bind_param("i", $rating);
 
     if ($stmt->execute()) {
-        header("Location: home_page.php?rating_success=1");
+        header("Location: home_page.html?rating_success=1");
         exit();
     } else {
         echo "Error storing rating: " . $stmt->error;
