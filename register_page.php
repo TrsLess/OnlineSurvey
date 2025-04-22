@@ -30,7 +30,7 @@
         </div>
         <button type="submit" class="btn btn-primary w-100">Register</button>
         <p class="text-center mt-2">
-          Already have an account? <a href="./login_page.html">Login</a>
+          Already have an account? <a href="./login_page.php">Login</a>
         </p>
       </form>
     </div>
