@@ -31,7 +31,7 @@
 
         <button type="submit" class="btn btn-success w-100">Login</button>
         <p class="text-center mt-2">
-          Don't have an account? <a href="./register_page.html">Register</a>
+          Don't have an account? <a href="./register_page.php">Register</a>
         </p>
       </form>
     </div>
