@@ -35,16 +35,10 @@
   <form id="surveyForm" action="submit_survey.php" method="POST">
     <div id="questionContainer"></div>
 
-     <input type="hidden" name="q1" id="q1Input">
-  <input type="hidden" name="q2" id="q2Input">
-  <input type="hidden" name="q3" id="q3Input">
-  <input type="hidden" name="q4" id="q4Input">
-  <input type="hidden" name="q5" id="q5Input">
-  <input type="hidden" name="q6" id="q6Input">
-  <input type="hidden" name="q7" id="q7Input">
-  <input type="hidden" name="q8" id="q8Input">
-  <input type="hidden" name="q9" id="q9Input">
-  <input type="hidden" name="q10" id="q10Input">
+     <?php for ($i = 1; $i <= 10; $i++): ?>
+      <input type="hidden" name="q<?= $i ?>" id="q<?= $i ?>Input">
+    <?php endfor; ?>
+
 
     <div class="d-grid mt-3">
       <input type="submit" class="btn btn-primary d-none" id="submitBtn" value="submit" name="submit">
