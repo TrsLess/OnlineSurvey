@@ -30,7 +30,7 @@ $stmt->bind_param("ssssssssss", $q1, $q2, $q3, $q4, $q5, $q6, $q7, $q8, $q9, $q1
 
 if ($stmt->execute()) {
     echo "Thank you for completing the survey!";
-    header("Location: rating.php");
+    header("Location: rating.html");
 } else {
     echo "Error: " . $stmt->error;
 }
