@@ -35,9 +35,10 @@
   <form id="surveyForm" action="submit_survey.php" method="POST">
     <div id="questionContainer"></div>
 
-    <?php for ($i = 1; $i <= 10; $i++): ?>
+     <?php for ($i = 1; $i <= 10; $i++): ?>
       <input type="hidden" name="q<?= $i ?>" id="q<?= $i ?>Input">
     <?php endfor; ?>
+
 
     <div class="d-grid mt-3">
       <input type="submit" class="btn btn-primary d-none" id="submitBtn" value="submit" name="submit">
