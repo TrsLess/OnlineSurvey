@@ -69,8 +69,8 @@ function showQuestion(index) {
       <label class="form-label fs-5">${question.text}</label>
   `;
 
-  let inputs = "";
-  question.options.forEach((opt, i) => {
+  let inputs = ""; //to hold radio inputs
+  question.options.forEach((opt, i) => { //Loops through the options and creates a radio button for each one.
       const id = `q${qNum}_${i}`;
       const nameAttr = `name="q${qNum}"`;
       const requiredAttr = "required";

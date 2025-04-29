@@ -1,12 +1,11 @@
 <?php
 session_start();
-// Simple admin access control
 $adminPassword = "admin123";
 
 if (!isset($_SESSION['admin_logged_in'])) {
     if (isset($_POST['password']) && $_POST['password'] === $adminPassword) {
         $_SESSION['admin_logged_in'] = true;
-        header("Location: dashboard.php");
+        header("Location: ratings_dashboard.php");
         exit();
     }
     echo '<!DOCTYPE html>
@@ -33,22 +32,21 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle Delete Request
+// Handle delete
 if (isset($_POST['delete_id'])) {
     $delete_id = intval($_POST['delete_id']);
-    $stmt = $conn->prepare("DELETE FROM survey_responses WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM survey_ratings WHERE id = ?");
     $stmt->bind_param("i", $delete_id);
     $stmt->execute();
     $stmt->close();
-    header("Location: dashboard.php?sort=" . ($_GET['sort'] ?? 'desc'));
+    header("Location: ratings_dashboard.php?sort=" . ($_GET['sort'] ?? 'desc'));
     exit();
 }
 
-// Handle sorting direction
-$sort = (isset($_GET['sort']) && $_GET['sort'] === 'asc') ? 'asc' : 'desc';
+// Handle sorting
+$sort = isset($_GET['sort']) && $_GET['sort'] === 'asc' ? 'asc' : 'desc';
 $nextSort = $sort === 'asc' ? 'desc' : 'asc';
-
-$sql = "SELECT * FROM survey_responses ORDER BY id $sort";
+$sql = "SELECT * FROM survey_ratings ORDER BY id $sort";
 $result = $conn->query($sql);
 ?>
 
@@ -58,8 +56,9 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard - Survey Responses</title>
+    <title>Ratings Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
         body {
             background-color: #f8f9fa;
@@ -76,37 +75,33 @@ $result = $conn->query($sql);
             max-width: 400px;
             margin-bottom: 20px;
         }
+
+        .star-display {
+            color: #ffc107;
+            font-size: 1.25rem;
+        }
     </style>
 </head>
 
 <body class="p-4">
 
     <div class="container">
-        <h2 class="mb-4 text-center">📊 Survey Responses Dashboard</h2>
+        <h2 class="mb-4 text-center">⭐ Survey Ratings Dashboard</h2>
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-            <input type="text" id="searchInput" class="form-control search-box me-2" placeholder="Search answers...">
-            <a href="?sort=<?= $nextSort ?>" class="btn btn-outline-primary mb-2">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+            <input type="text" id="searchInput" class="form-control search-box me-2" placeholder="Search ratings...">
+            <a href="?sort=<?= $nextSort ?>" class="btn btn-outline-primary">
                 Sort by ID <?= $sort === 'asc' ? '🔼' : '🔽' ?>
             </a>
         </div>
 
         <div class="table-container table-responsive">
-            <table class="table table-bordered table-hover align-middle text-center" id="surveyTable">
-                <thead class="table-primary">
+            <table class="table table-bordered table-hover align-middle text-center" id="ratingsTable">
+                <thead class="table-warning">
                     <tr>
                         <th>ID</th>
-                        <th>Q1</th>
-                        <th>Q2</th>
-                        <th>Q3</th>
-                        <th>Q4</th>
-                        <th>Q5</th>
-                        <th>Q6</th>
-                        <th>Q7</th>
-                        <th>Q8</th>
-                        <th>Q9</th>
-                        <th>Q10</th>
-                        <th>Date</th>
+                        <th>Rating</th>
+                        <th>Submitted At</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -114,21 +109,16 @@ $result = $conn->query($sql);
                     <?php if ($result->num_rows > 0): ?>
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
-                                <td><?= htmlspecialchars($row['id']) ?></td>
-                                <td><?= htmlspecialchars($row['q1']) ?></td>
-                                <td><?= htmlspecialchars($row['q2']) ?></td>
-                                <td><?= htmlspecialchars($row['q3']) ?></td>
-                                <td><?= htmlspecialchars($row['q4']) ?></td>
-                                <td><?= htmlspecialchars($row['q5']) ?></td>
-                                <td><?= htmlspecialchars($row['q6']) ?></td>
-                                <td><?= htmlspecialchars($row['q7']) ?></td>
-                                <td><?= htmlspecialchars($row['q8']) ?></td>
-                                <td><?= htmlspecialchars($row['q9']) ?></td>
-                                <td><?= htmlspecialchars($row['q10']) ?></td>
-                                <td><?= htmlspecialchars($row['created_at'] ?? 'N/A') ?></td>
+                                <td><?= $row['id'] ?></td>
                                 <td>
-                                    <form method="POST"
-                                        onsubmit="return confirm('Are you sure you want to delete this response?');">
+                                    <span class="star-display">
+                                        <?= str_repeat('<i class="fas fa-star"></i>', $row['rating']) ?>
+                                        <?= str_repeat('<i class="far fa-star"></i>', 5 - $row['rating']) ?>
+                                    </span>
+                                </td>
+                                <td><?= htmlspecialchars($row['created_at']) ?></td>
+                                <td>
+                                    <form method="POST" onsubmit="return confirm('Delete this rating?');">
                                         <input type="hidden" name="delete_id" value="<?= $row['id'] ?>">
                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
@@ -137,7 +127,7 @@ $result = $conn->query($sql);
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="13">No survey responses found.</td>
+                            <td colspan="4">No ratings found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -148,10 +138,8 @@ $result = $conn->query($sql);
     <script>
         document.getElementById('searchInput').addEventListener('keyup', function () {
             const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#surveyTable tbody tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
+            document.querySelectorAll('#ratingsTable tbody tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(filter) ? '' : 'none';
             });
         });
     </script>
@@ -160,6 +148,4 @@ $result = $conn->query($sql);
 
 </html>
 
-<?php
-$conn->close();
-?>
+<?php $conn->close(); ?>
